@@ -2,7 +2,6 @@ import Button from "../Button";
 import React from "react";
 import FileInput from "../FileInput";
 import UploadedImages from "../UploadedImages";
-
 import CreatedDocument from "../Document";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 
@@ -13,7 +12,7 @@ export interface FormData {
 const Form = () => {
 
     const [formData, setFormData] = React.useState<FormData>({ text: ''});
-    const [files, setFiles] = React.useState<File[]>([]);
+    const [images, setImages] = React.useState<File[]>([]);
     const [isGenerated, setIsGenerated] = React.useState<boolean>(false);
 
     function handleInputChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -25,7 +24,7 @@ const Form = () => {
         event.preventDefault();
 
         console.log(formData)
-        console.log(files)
+        console.log(images)
 
         setIsGenerated(true);
     }
@@ -35,38 +34,43 @@ const Form = () => {
             const newImage = event.target.files[0];
     
             if(!verifyImageAlreadyUploaded(newImage)) {
-                setFiles((prevFiles) => [...prevFiles, newImage]);
+                setImages((previmages) => [...previmages, newImage]);
             }
         }
     }
 
     function verifyImageAlreadyUploaded(newImage: File) {
-        if(files.find(file => file.name === newImage.name)) {
+        if(images.find(file => file.name === newImage.name)) {
             return true;
         }
+    }
+
+    function handleRemoveImage(index: number) {
+        setImages(images.filter((_, i) => i !== index));
     }
     
     return (
         <form onSubmit={onSubmit}>
+            <h1>Crie seu próprio PDF!</h1>
             <label>
                 Seu texto:
                 <textarea name="text" value={formData.text} onChange={handleInputChange} />
             </label>
             <br />
-            {files.map(file => <UploadedImages image={file} key={file.name} />)}
+            <UploadedImages images={images} removeImage={handleRemoveImage} />
             <Button text="Gerar"/>
             <FileInput onChange={handleFileChange}></FileInput>
             {isGenerated && (
                 <>
                 <PDFViewer>
-                    <CreatedDocument files={files} formData={formData}></CreatedDocument>
-                </PDFViewer>   
+                    <CreatedDocument files={images} formData={formData}></CreatedDocument>
+                </PDFViewer>
                 <PDFDownloadLink
-                    document={<CreatedDocument formData={formData} files={files} />}
-                    fileName="document.pdf"
-                >
-                    {({ blob, url, loading, error }) =>
-                    loading ? 'Gerando PDF...' : 'Baixar PDF'
+                    document={<CreatedDocument formData={formData} files={images} />}
+                    fileName="document.pdf">
+                    {
+                        ({ blob, url, loading, error }) =>
+                        loading ? 'Gerando PDF...' : 'Baixar PDF'
                     }
                 </PDFDownloadLink>                
                 </>

@@ -1,25 +1,23 @@
-import { useState } from "react";
-
 interface UploadedImagesProps {
-    image: File;
+    images: File[];
+    removeImage: (index: number) => void;
 }
 
 const UploadedImages = (props: UploadedImagesProps) => {
-    const [selectedImage, setSelectedImage] = useState<File | null>(props.image);
 
     return (
-        <>
-            {selectedImage && (
-            <div>
-                <img
-                alt="not found"
-                src={URL.createObjectURL(selectedImage)}
-                />
-            <br /> <br />
-                <button onClick={() => setSelectedImage(null)}>Remove</button>
-            </div>
-            )}
-        </>
+        <div>
+            {Boolean(props.images.length) && props.images.map((image, index) => (
+                <div key={index}>
+                    <img
+                    alt="not found"
+                    src={URL.createObjectURL(image)}
+                    />
+                <br/> <br/>
+                    <button onClick={() => props.removeImage(index)}>Remover</button>
+                </div>
+            ))}
+        </div>
     );
 }
 
