@@ -2,8 +2,11 @@ import Button from "../Button";
 import React from "react";
 import FileInput from "../FileInput";
 import UploadedImages from "../UploadedImages";
-import CreatedDocument from "../Document";
+import CreatedDocument from "../CreatedDocument";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import requestApi from "../../api";
+import { verifyIfImageAlreadyUploaded } from "../../utils";
+import './index.css';
 
 export interface FormData {
   text: string;
@@ -16,6 +19,8 @@ const Form = () => {
     const [isGenerated, setIsGenerated] = React.useState<boolean>(false);
 
     function handleInputChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+        event.preventDefault();
+
         const { name, value } = event.target;
         setFormData({ ...formData, [name]: value });
     }
@@ -23,57 +28,68 @@ const Form = () => {
     function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        console.log(formData)
-        console.log(images)
-
         setIsGenerated(true);
     }
 
     function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+        event.preventDefault();
+
+        console.log(event.target.files)
         if(event.target.files) {
             const newImage = event.target.files[0];
-    
-            if(!verifyImageAlreadyUploaded(newImage)) {
+            
+            if(!verifyIfImageAlreadyUploaded(images, newImage)) {
+                console.log(images)
+                console.log(newImage)
                 setImages((previmages) => [...previmages, newImage]);
             }
         }
     }
 
-    function verifyImageAlreadyUploaded(newImage: File) {
-        if(images.find(file => file.name === newImage.name)) {
-            return true;
-        }
+    function handleRemoveImage(index: number) {
+        console.log(images)
+        setImages(images.filter((_, i) => i !== index));
+        console.log(images)
     }
 
-    function handleRemoveImage(index: number) {
-        setImages(images.filter((_, i) => i !== index));
+    function handleApiRequest() {
+        // P.s: aqui seria enviado o pdf como blob ou base64 ou alguma coisa assim :P
+        requestApi(new FormData());
     }
     
     return (
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} className="documentForm">
             <h1>Crie seu próprio PDF!</h1>
-            <label>
-                Seu texto:
-                <textarea name="text" value={formData.text} onChange={handleInputChange} />
+            <br />
+            <label className="labelInput">
+                Insira aqui seu texto:
+                <textarea className="paragraphInput" name="text" value={formData.text} onChange={handleInputChange} placeholder="Você pode inserir quantas linhas desejar!"/>
             </label>
             <br />
             <UploadedImages images={images} removeImage={handleRemoveImage} />
-            <Button text="Gerar"/>
             <FileInput onChange={handleFileChange}></FileInput>
+            <br/>
+            <Button text="Gerar"/>
+            <br/>
             {isGenerated && (
-                <>
-                <PDFViewer>
-                    <CreatedDocument files={images} formData={formData}></CreatedDocument>
-                </PDFViewer>
-                <PDFDownloadLink
-                    document={<CreatedDocument formData={formData} files={images} />}
-                    fileName="document.pdf">
-                    {
-                        ({ blob, url, loading, error }) =>
-                        loading ? 'Gerando PDF...' : 'Baixar PDF'
-                    }
-                </PDFDownloadLink>                
-                </>
+                <div className="documentContainer">
+                    <h2>Pré-visualização:</h2>
+                    <PDFViewer className="pdfViewer">
+                        <CreatedDocument files={images} formData={formData}/>
+                    </PDFViewer>
+
+                    <PDFDownloadLink
+                        className="documentLink"
+                        document={<CreatedDocument formData={formData} files={images} />}
+                        fileName="document.pdf">
+                        {
+                            ({ blob, url, loading, error }) =>
+                            loading ? 'Gerando PDF...' : 'Baixar PDF'
+                        }
+                    </PDFDownloadLink>
+                    
+                    <Button text="Enviar para API" handleOnClick={handleApiRequest}/>
+                </div>
             )}
         </form>
     )

@@ -18,7 +18,6 @@ const CreatedDocument = (props: DocumentProps) => {
     const styles = StyleSheet.create({
         page: {
           flexDirection: 'column',
-          backgroundColor: '#E4E4E4'
         },
         section: {
           margin: 10,
@@ -27,17 +26,21 @@ const CreatedDocument = (props: DocumentProps) => {
         },
         text: {
             fontFamily: "Josefin Sans",
+        },
+        document: {
+            width: '100%',
+            height: '100%'
         }
     });
 
     return (
-        <Document>
-            <Page size="A4" style={styles.page}>
+        <Document style={styles.document}>
+            {props.formData.text.trim() && <Page size="A4" style={styles.page}>
                 <DocumentHeader/>
                 <View style={styles.section}>
                     <Text style={styles.text}>{props.formData.text}</Text>
                 </View>
-            </Page>
+            </Page>}
             {props.files.map((file, index) => (
                 <Page size="A4" style={styles.page} key={index}>
                     <DocumentHeader/>

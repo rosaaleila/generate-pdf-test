@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 
 interface FileInputProps {
     onChange: React.ChangeEventHandler<HTMLInputElement>
 }
 
-// Define a functional component named UploadAndDisplayImage
 const FileInput = (props: FileInputProps) => {
   return (
     <div>

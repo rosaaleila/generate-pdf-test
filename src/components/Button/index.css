@@ -1,0 +1,8 @@
+.customBtn {
+    padding: 10px;
+    border-radius: 2px;
+    background-color: #94c11f;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
