@@ -55,6 +55,8 @@ const Form = () => {
     function handleApiRequest() {
         // P.s: aqui seria enviado o pdf como blob ou base64 ou alguma coisa assim :P
         requestApi(new FormData());
+
+        alert('PDF enviado!');
     }
     
     return (
