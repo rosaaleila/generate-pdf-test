@@ -34,28 +34,23 @@ const Form = () => {
     function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
         event.preventDefault();
 
-        console.log(event.target.files)
         if(event.target.files) {
             const newImage = event.target.files[0];
             
             if(!verifyIfImageAlreadyUploaded(images, newImage)) {
-                console.log(images)
-                console.log(newImage)
                 setImages((previmages) => [...previmages, newImage]);
             }
         }
     }
 
     function handleRemoveImage(index: number) {
-        console.log(images)
         setImages(images.filter((_, i) => i !== index));
-        console.log(images)
     }
 
     function handleApiRequest() {
         // P.s: aqui seria enviado o pdf como blob ou base64 ou alguma coisa assim :P
         requestApi(new FormData());
-
+      
         alert('PDF enviado!');
     }
     
@@ -73,6 +68,7 @@ const Form = () => {
             <br/>
             <Button text="Gerar"/>
             <br/>
+            
             {isGenerated && (
                 <div className="documentContainer">
                     <h2>Pré-visualização:</h2>
@@ -93,6 +89,7 @@ const Form = () => {
                     <Button text="Enviar para API" handleOnClick={handleApiRequest}/>
                 </div>
             )}
+          
         </form>
     )
 }
